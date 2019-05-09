@@ -1,0 +1,61 @@
+# Question 1: Determine the percentage of minorities in each show? 
+
+import pandas as pd
+import matplotlib.pyplot as plt
+import datetime
+import numpy as np
+
+from google.colab import files
+uploaded = files.upload()
+
+
+import io
+df = pd.read_csv(io.BytesIO(uploaded['allTheaterDataV2.csv']))
+
+
+# want to select shows(ID) that had more minorities than Caucasians in the cast
+# once determined, the selected shows should be placed into a new data frame that 
+# will only hold the shows and the related ethnicity, and compared to audience ethnicity
+# this information should then be plotted 
+ 
+
+## define a sum column for non caucasian actors (I suppose?)
+df['minoritycast']=df[['AFRAM','ASIAM','LAT','OTH']].sum(axis=1)
+## build a ratio of non caucasian to caucasian
+df['cast_ratio']=df['minoritycast']/df['CAU']
+
+## make a quick plot
+#fig,ax=plt.subplots()
+fig,ax=plt.subplots(figsize=(20,20))
+ax.barh(df['ID'],df['cast_ratio'])
+ax.set_ylabel('Cast Minority Numbers Ratio')
+ax.set_xlabel('Number of Actors in Cast')
+plt.title('Cast Information ')
+plt.tight_layout()
+plt.show()
+
+
+# Question 2: How does the ethnicity of the cast change for each show over the years?
+
+# drop the ID column since it is just a string
+df = df.drop(['ID'], axis = 1)
+
+# only want to include the ethnicity data
+df = df.drop(['MALE', 'FEM', '>18', '18-24', '25-34', 'SC', 'CC', 'SGS', 'BLK', 'ASN', 'MRO'], axis = 1)
+df = df.drop(['35-49', '50-64', '65 or older', '25,000-49,000', 'CGS', 'VD', 'WHT'], axis = 1)
+df = df.drop(['HSL', 'HSP', '150,000<', '100,000-149,000', '25,000', '50,000-74,000', '75,000-99,000'], axis = 1)
+
+# group by season and add the other columns
+ethnicseasontotaldf = df.groupby('Season').sum()
+
+print(ethnicseasontotaldf)
+
+# now we want to plot all the ethnicity per season to see the changes over time
+
+fig,ax=plt.subplots(figsize=(10,10))
+df.plot(x= "Season", y= ["AFRAM","ASIAM","CAU","LAT","OTH"], kind= "barh", 
+        subplots=True, grid=False, figsize = (30,100),
+        title = 'Ethnicity of Cast between 2008-2014', fontsize = 20, stacked =True)
+
+
+plt.show()
