@@ -19,7 +19,7 @@ df = pd.read_csv(io.BytesIO(uploaded['allTheaterDataV2.csv']))
 # this information should then be plotted 
  
 
-## define a sum column for non caucasian actors (I suppose?)
+## define a sum column for to calculate the ratio of minorities to all other actors
 df['minoritycast']=df[['AFRAM','ASIAM','LAT','OTH']].sum(axis=1)
 ## build a ratio of non caucasian to caucasian
 df['cast_ratio']=df['minoritycast']/df['CAU']
